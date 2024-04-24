@@ -1,6 +1,8 @@
 # OSCP-Cheat-Sheet
 
+Hello and thank you for viewing my own cheat sheat that helped me pass the OSCP Exam! It is broken down in 5 sections: scanning, services, linux, windows/active directory, and exploitation.
 
+# Scanning
 
 ## Nmap  
  
